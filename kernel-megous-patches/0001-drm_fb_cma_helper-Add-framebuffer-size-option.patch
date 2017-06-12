@@ -1,0 +1,38 @@
+From 691db8e0565daa2267b3563ff148fe9673d8d1d5 Mon Sep 17 00:00:00 2001
+From: noblock <noblock@users.noreply.github.com>
+Date: Mon, 12 Jun 2017 23:54:51 +0200
+Subject: [PATCH] drm_fb_cma_helper: Add framebuffer size option.
+
+---
+ drivers/gpu/drm/drm_fb_cma_helper.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/gpu/drm/drm_fb_cma_helper.c b/drivers/gpu/drm/drm_fb_cma_helper.c
+index 596fabf18c3e..e920f7a0b547 100644
+--- a/drivers/gpu/drm/drm_fb_cma_helper.c
++++ b/drivers/gpu/drm/drm_fb_cma_helper.c
+@@ -31,6 +31,10 @@
+ 
+ #define DEFAULT_FBDEFIO_DELAY_MS 50
+ 
++static int smem_len_size = 2048 * 1080 * 4 * 2 / 1024;
++module_param(smem_len_size, int, 0444);
++MODULE_PARM_DESC(smem_len_size, "Maximum framebuffer size (kB)");
++
+ struct drm_fb_cma {
+ 	struct drm_framebuffer		fb;
+ 	struct drm_gem_cma_object	*obj[4];
+@@ -427,6 +431,10 @@ drm_fbdev_cma_create(struct drm_fb_helper *helper,
+ 		sizes->surface_depth);
+ 
+ 	size = mode_cmd.pitches[0] * mode_cmd.height;
++
++	if (smem_len_size * 1024 > size)
++	  size = smem_len_size * 1024;
++
+ 	obj = drm_gem_cma_create(dev, size);
+ 	if (IS_ERR(obj))
+ 		return -ENOMEM;
+-- 
+2.13.1
+

@@ -1,0 +1,68 @@
+From a79879274934d92e35fb22f131737250ac20f4b5 Mon Sep 17 00:00:00 2001
+From: Icenowy Zheng <icenowy@aosc.io>
+Date: Thu, 18 May 2017 11:10:32 +0800
+Subject: [PATCH] ARM: sun8i: dt: Add mali node
+
+The A23 and A33 have an ARM Mali 400 GPU. Now that we have a binding, add
+it to our DT.
+
+Signed-off-by: Icenowy Zheng <icenowy@aosc.io>
+---
+ arch/arm/boot/dts/sun8i-h3.dtsi | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
+
+diff --git a/arch/arm/boot/dts/sun8i-h3.dtsi b/arch/arm/boot/dts/sun8i-h3.dtsi
+index ea74f580d42b..c187ebb6e325 100644
+--- a/arch/arm/boot/dts/sun8i-h3.dtsi
++++ b/arch/arm/boot/dts/sun8i-h3.dtsi
+@@ -85,6 +85,47 @@
+ 			     <GIC_PPI 11 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_LOW)>,
+ 			     <GIC_PPI 10 (GIC_CPU_MASK_SIMPLE(4) | IRQ_TYPE_LEVEL_LOW)>;
+ 	};
++
++	reserved-memory {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++
++		cma: linux,cma {
++			compatible = "shared-dma-pool";
++			reusable;
++			size = <0x4000000>;
++			alignment = <0x2000>;
++			linux,cma-default;
++		};
++	};
++
++	mali: gpu@1c40000 {
++		compatible = "allwinner,sun8i-h3-mali",
++			     "allwinner,sun7i-a20-mali", "arm,mali-400";
++		reg = <0x01c40000 0x10000>;
++		interrupts = <GIC_SPI 97 IRQ_TYPE_LEVEL_HIGH>,
++			     <GIC_SPI 98 IRQ_TYPE_LEVEL_HIGH>,
++			     <GIC_SPI 99 IRQ_TYPE_LEVEL_HIGH>,
++			     <GIC_SPI 100 IRQ_TYPE_LEVEL_HIGH>,
++			     <GIC_SPI 102 IRQ_TYPE_LEVEL_HIGH>,
++			     <GIC_SPI 103 IRQ_TYPE_LEVEL_HIGH>,
++			     <GIC_SPI 101 IRQ_TYPE_LEVEL_HIGH>;
++		interrupt-names = "gp",
++				  "gpmmu",
++				  "pp0",
++				  "ppmmu0",
++				  "pp1",
++				  "ppmmu1",
++				  "pmu";
++		clocks = <&ccu CLK_BUS_GPU>, <&ccu CLK_GPU>;
++		clock-names = "bus", "core";
++		resets = <&ccu RST_BUS_GPU>;
++		memory-region = <&cma>;
++
++		assigned-clocks = <&ccu CLK_GPU>;
++		assigned-clock-rates = <384000000>;
++	};
+ };
+ 
+ &ccu {
+-- 
+2.13.1
+
