@@ -10,8 +10,11 @@ The patch set a framebuffer large enough for 1980x1080 double buffering; This is
 * The 'de2' drm fbdev driver must be loaded and running.
 * The current drm/framebuffer implementation can't change the vyres size (fbset -vyres 2160 will fail). A 'fix' is provided that will change the fbdev ioctl value on the fly.
 
-* To compile the 'fixer' (based on code from lima (https://github.com/limadriver-ng/lima.git)):pr
-make  
+* To compile the 'fixer' (based on code from lima (https://github.com/limadriver-ng/lima.git)):
 
-To test:
+make
+
+
+Test:
+
 LD_PRELOAD=fixer/libMali_fixer.so glmark2-es2-fb
